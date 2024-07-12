@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% comment %} <title>Employee</title> {% endcomment %}
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <!----------------------------------- navbar ---------------------------------------->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        {% comment %} <a class="navbar-brand" href="#">Employee Management</a> {% endcomment %}
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <form class="form-inline">
+                        <label class="mr-sm-2" for="empcode">Empcode Selection:</label>
+                        <select class="custom-select mr-sm-2" id="empcode" name="empcode">
+                            {% for employee in employees %}
+                                <option value="{{ employee.empcode }}" {% if selected_employee and employee.empcode == selected_employee.empcode %}selected{% endif %}>
+                                     ({{ employee.empcode }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                        
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
+<!----------------------------------- emp details ---------------------------------------->
+    <div id="employee-details" >
+        {% if selected_employee %}
+
+        <!----------------------------------- emp with img details ---------------------------------------->
+        <div class="card container mt-5" style="width:280px; height:500px; margin: 0% 5% 0% 3%; float:left; box-shadow: 5px 10px 18px #888888;">
+            <img class="card-img-top" src="{% static 'img_avatar.png' %}" alt="Card image" style="padding:25px 25px 25px 25px">
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ selected_employee.username }}</p>
+                <p><strong>Designation:</strong> {{ selected_employee.designation }}</p>
+                <p><strong>Department:</strong> {{ selected_employee.department }}</p>
+            </div>
+        </div>
+
+        <!----------------------------------- emp personal details ---------------------------------------->
+        <div class="div"   style="display:inline-block; ">
+            <div class="card container mt-5" style="width: 600px; height:280px; padding:2% 2% 0% 2%; display:block; box-shadow: 5px 10px 18px #888888;">
+                
+                <div class="card-body">
+                    <h3>Personal Information</h3>
+                    <p><strong>Name:</strong> {{ selected_employee.username }}</p>
+                    <p><strong>Qualification:</strong> {{ selected_employee.qualification }}</p>
+                    <p><strong>DOB:</strong> {{ selected_employee.dob }}</p>
+                    <p><strong>Gender:</strong> {{ selected_employee.gender }}</p>
+                </div>
+    
+            </div>
+    <!----------------------------------- emp contact details ---------------------------------------->
+            <div class="card container mt-5" style="width:600px; height:173px; display:block; box-shadow: 3px 7px 10px #888888;">
+               
+                <div class="card-body">
+                    <h3>Contact Details</h3>
+                    <p><strong>Email:</strong> {{ selected_employee.email }}</p>
+                    <p><strong>Phone Number:</strong> {{ selected_employee.mobile }}</p>
+                    <p><strong>Extension:</strong> {{ selected_employee.extension }}</p>
+                </div>
+    
+            </div>
+        </div>
+<!----------------------------------- view ercords button ---------------------------------------->
+        <div   style=" width:230px; height:120px; margin: 6% 3% 0% 3%;float:right; ">
+            
+            <div class="card-body">
+                <button type="button" class="btn btn-primary" 
+                style=" text-align: center; box-shadow: 1px 5px 10px #888888;" onclick="viewRecords()">View Records</button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    
+
+    <!----------------------------------- js for actions ---------------------------------------->
+    <script>
+        document.getElementById('empcode').addEventListener('change', function() {
+            const empcode = this.value;
+            fetch(`{% url 'home' %}?empcode=${empcode}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('employee-details').innerHTML = new DOMParser().parseFromString(html, 'text/html').getElementById('employee-details').innerHTML;
+                });
+        });
+
+        function viewRecords() {
+            const empcode = document.getElementById('empcode').value;
+            window.location.href = `{% url 'records' %}?empcode=${empcode}`;
+        }
+    </script>
+</body>
+</html>
+
